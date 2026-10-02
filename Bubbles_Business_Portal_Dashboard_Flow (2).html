@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bubbles Networks – Business Portal (Dashboard flow)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+<style>
+:root{--brand-primary:#3A76F0;--brand-primary-hover:#2E5FC0;--brand-primary-pressed:#254B99;--brand-primary-tint:#E7EFFD;--brand-on-primary:#fff;--success:#34C759;--warning:#FF9500;--error:#FF3B30;--info:#007AFF;--bg:#fff;--surface:#fff;--surface-secondary:#F9FAFB;--text:#000;--border:#E5E7EB;--mute:#6B7280;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--surface-secondary);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.top{max-width:760px;margin:auto;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.logo{font-weight:800;color:var(--brand-primary);font-size:18px}.logo small{color:var(--mute);font-weight:500;font-size:12px;margin-left:4px}
+.lnk{background:none;border:0;color:var(--brand-primary);font:600 14px inherit;font-family:inherit;cursor:pointer;padding:6px 8px}
+main{max-width:760px;margin:16px auto 20px;padding:0 14px}
+.steps{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:14px}
+.st{flex:1;text-align:center;font-size:12px;color:var(--mute)}.st.done{cursor:pointer}
+.st b{display:grid;place-items:center;width:28px;height:28px;margin:0 auto 4px;border-radius:50%;background:var(--border);font-size:13px}
+.st.on b{background:var(--brand-primary);color:#fff}.st.on{color:var(--text);font-weight:600}.st.done b{background:var(--success);color:#fff}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:24px 0 8px}p.sub{color:var(--mute);margin:0 0 16px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+input,textarea,select{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--brand-primary);border-color:var(--brand-primary)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.row{grid-template-columns:1fr}}
+.hint{font-size:13px;color:var(--mute);font-weight:400}.err{font-size:13px;color:var(--error);margin-top:6px}
+.btn{border:0;border-radius:10px;padding:12px 18px;font:600 15px inherit;font-family:inherit;cursor:pointer;background:var(--brand-primary);color:#fff;white-space:nowrap}
+.btn:hover{background:var(--brand-primary-hover)}.btn:active{background:var(--brand-primary-pressed)}
+.btn.ghost{background:var(--surface);color:var(--brand-primary);border:1.5px solid var(--brand-primary)}.btn.ghost:hover{background:var(--brand-primary-tint)}
+.bar{display:flex;gap:10px;justify-content:space-between;margin-top:22px;flex-wrap:wrap}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:520px){.opts{grid-template-columns:1fr}}
+.opt{border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer}.opt:hover{border-color:var(--brand-primary);background:var(--brand-primary-tint)}
+.opt .ic{font-size:26px}.opt b{display:block}.opt span{font-size:13px;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:7px 12px;border:1.5px solid var(--border);border-radius:99px;font-size:13px;cursor:pointer;background:var(--surface)}.chip:hover{border-color:var(--brand-primary)}.chip.sel{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.ph{aspect-ratio:1;border:2px dashed var(--border);border-radius:12px;display:grid;place-items:center;color:var(--mute);font-size:12px;text-align:center;cursor:pointer;background-size:cover;background-position:center;position:relative}
+.ph i{position:absolute;top:3px;right:3px;background:#000a;color:#fff;border-radius:50%;width:20px;height:20px;font-style:normal;line-height:20px}
+.note{background:var(--brand-primary-tint);border-radius:10px;padding:10px 12px;font-size:14px;margin:10px 0}.note.bad{background:#FF3B3015;border-left:4px solid var(--error)}.note.ok{background:#34C75918;border-left:4px solid var(--success)}
+.adds{display:flex;gap:8px;flex-wrap:wrap}.adds .btn{padding:8px 14px;font-size:14px}
+.f2{display:flex;gap:8px}.f2 select{width:auto;max-width:42%}
+.phone{max-width:340px;margin:auto;border:8px solid #111;border-radius:30px;overflow:hidden}
+.pv-img{height:170px;background:var(--brand-primary);background-size:cover;background-position:center}
+.pv{padding:14px}.pv .tag{display:inline-block;background:var(--brand-primary);color:#fff;border-radius:99px;padding:3px 12px;font-weight:700;font-size:14px}.pv h3{margin:8px 0 2px}.pv small{color:var(--mute)}
+.plan{display:flex;gap:10px;align-items:center;border:2px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer}.plan.sel{border-color:var(--brand-primary);background:var(--brand-primary-tint)}.plan.off{opacity:.5;cursor:not-allowed}
+.plan input{width:auto}.plan div{flex:1}.plan span{font-size:13px;color:var(--mute);display:block}
+.code{letter-spacing:10px;text-align:center;font-size:22px}.center{text-align:center}.big{font-size:54px}.hide{display:none}
+.chat{height:380px;overflow-y:auto;background:var(--surface-secondary);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.m{max-width:82%;padding:9px 13px;border-radius:16px;font-size:15px}.m.n{background:var(--surface);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}.m.u{background:var(--brand-primary);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.av{font-size:12px;color:var(--brand-primary);font-weight:700}
+.ov{position:fixed;inset:0;background:#0006;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:620px;max-height:94%;overflow:auto;border-radius:18px 18px 0 0;padding:16px}
+@media(min-width:700px){.ov{align-items:center}.sheet{border-radius:18px}}
+.sg{border:1px solid var(--border);border-radius:10px;margin-top:6px;max-height:140px;overflow:auto}.sg div{padding:8px 12px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--border)}.sg div:hover{background:var(--brand-primary-tint)}
+
+header{background:linear-gradient(135deg,#254B99 0%,#3A76F0 62%,#6E9CFF 100%);color:#fff;border:0;position:relative;overflow:hidden;padding-bottom:44px}
+.bb{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffffff55,#ffffff10);border:1px solid #ffffff44}
+.b1{width:130px;height:130px;right:-30px;top:-50px}.b2{width:70px;height:70px;right:22%;bottom:6px}.b3{width:46px;height:46px;left:8%;bottom:14px}
+.top,.hero{position:relative}.logo{color:#fff;font-size:20px}.logo small{color:#ffffffcc}#hb .lnk{color:#fff}
+.hero{max-width:760px;margin:0 auto;padding:0 16px}.hero h2{margin:0;font-size:24px;line-height:1.2}.hero p{margin:2px 0 8px;opacity:.9;font-size:15px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}.pills span{background:#ffffff26;border:1px solid #ffffff44;border-radius:99px;padding:2px 10px;font-size:12px}
+@media(max-width:520px){.hero h2{font-size:22px}}
+main{margin-top:-32px;position:relative;z-index:6}
+.steps,.card{border:0;box-shadow:0 12px 32px rgba(37,75,153,.14)}
+.btn{box-shadow:0 4px 12px rgba(58,118,240,.28)}.btn.ghost{box-shadow:none}
+input,textarea,select{border-radius:12px;background:var(--surface-secondary)}input:focus,textarea:focus,select:focus{background:#fff}
+.opt{transition:.15s}.opt:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(58,118,240,.15)}
+#app{display:none}body.pt #app{display:block}body.pt header,body.pt main{display:none}
+.sb{position:fixed;left:0;top:0;bottom:0;width:248px;background:linear-gradient(180deg,#254B99,#3A76F0);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 12px 14px;display:flex;flex-direction:column;z-index:30;transition:.2s}
+.sl{font-weight:800;font-size:18px;white-space:nowrap;padding:0 10px 18px}.sl small{display:block;font-weight:500;font-size:12px;opacity:.75}
+.sb nav{flex:1}.sb a{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;color:#ffffffd9;cursor:pointer;margin-bottom:3px;font-weight:500}
+.sb a:hover{background:#ffffff1f}.sb a.on{background:#fff;color:var(--brand-primary-pressed);font-weight:700}
+.sp{background:#ffffff22;border-radius:14px;padding:12px;margin-bottom:10px;font-size:14px}.sp small{display:block;opacity:.85}.sp button{margin-top:8px;border:0;border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer;color:var(--brand-primary-pressed)}
+.mn{margin-left:248px;min-height:100vh;min-width:0}.tb{position:sticky;top:0;background:#ffffffee;backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:12px 22px;display:flex;align-items:center;gap:12px;z-index:10}
+.tb .btn{padding:9px 14px;font-size:14px}.hm{display:none;border:0;background:none;font-size:22px;cursor:pointer}
+.av2{width:36px;height:36px;border-radius:50%;background:var(--brand-primary);color:#fff;display:grid;place-items:center;font-weight:700}
+.ct{padding:22px 28px;max-width:none;width:100%}.scr{display:none}
+@media(max-width:860px){.sb{transform:translateX(-100%)}.sb.open{transform:none}.mn{margin-left:0}.hm{display:block}.scr.show{display:block;position:fixed;inset:0;background:#0006;z-index:25}.tb{padding:10px 14px}.ct{padding:14px}.av2{display:none}.tb .btn{font-size:12px;padding:8px 10px;white-space:normal}}
+.wel{background:linear-gradient(120deg,#3A76F0,#6E9CFF);color:#fff;border-radius:18px;padding:22px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.wel h1{margin:0}.wel p{margin:4px 0 0;opacity:.92}.wb{font-size:54px}
+.gr{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.sc2{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px}.sc2 .i{font-size:22px}.sc2 b{display:block;font-size:26px}.sc2 small{color:var(--mute)}.sc2 em{display:block;color:#1f9d45;font-style:normal;font-size:12px}
+.g2{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:12px}@media(max-width:760px){.g2{grid-template-columns:1fr}}
+.pc{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px}.pc h3{margin:0 0 10px;font-size:16px}.hd{display:flex;justify-content:space-between;align-items:center}
+.pr{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--border)}.pr:first-of-type{border:0}
+.th{width:64px;height:64px;border-radius:12px;background:var(--brand-primary) center/cover;flex:none}.pr .in{flex:1;min-width:160px}.pr small{color:var(--mute);display:block}
+.chip2{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#34C75922;color:#1f8a3b}.chip2.w{background:#FF950022;color:#b36500}
+.prog{height:8px;background:var(--border);border-radius:9px;overflow:hidden;margin:6px 0 10px}.prog i{display:block;height:100%;background:var(--brand-primary)}
+.ck{display:flex;gap:8px;font-size:14px;padding:3px 0}.ck.d{color:var(--mute)}
+.pl4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}.pl4 .pc{margin:0}.pl4 .on{border:2px solid var(--brand-primary);background:var(--brand-primary-tint)}
+details{border-top:1px solid var(--border);padding:10px 0}summary{cursor:pointer;font-weight:600}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:99px;z-index:50;font-size:14px}
+
+/* ===== address suggestions, country picker, live map, responsive ===== */
+.adw,.ccw{position:relative}
+.adl{position:absolute;left:0;right:0;top:100%;margin-top:6px;max-height:min(280px,45vh);background:var(--surface);box-shadow:0 12px 32px rgba(17,24,39,.18);z-index:15;border-color:var(--border)}
+.adl .it{display:block;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;font-size:14px;line-height:1.35}
+.adl .it:last-of-type{border-bottom:0}
+.adl .it b{display:block;font-weight:600}.adl .it span{display:block;color:var(--mute);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.adl .it:hover,.adl .it.act{background:var(--brand-primary-tint)}
+.adl .msg{padding:12px;color:var(--mute);font-size:13.5px}
+.adl .att{padding:6px 12px;font-size:11px;color:var(--mute);background:var(--surface-secondary);border-top:1px solid var(--border);position:sticky;bottom:0}
+.ccb{flex:none;display:flex;align-items:center;gap:7px;padding:0 12px;min-height:46px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface-secondary);color:var(--text);font:inherit;cursor:pointer;white-space:nowrap}
+.ccb:hover,.ccb[aria-expanded=true]{border-color:var(--brand-primary);background:#fff}
+.ccb .car{font-size:11px;color:var(--mute)}
+.fl{width:24px;height:18px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px #0002;flex:none;display:inline-block;vertical-align:middle}
+.flx{font-size:18px;line-height:1;width:24px;text-align:center;flex:none}
+.ccp{position:absolute;top:100%;left:0;margin-top:6px;width:min(360px,100%);background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 32px rgba(17,24,39,.2);z-index:15;padding:8px}
+.ccp .ccs{margin-bottom:6px}
+.ccl{max-height:min(260px,40vh);overflow:auto;overscroll-behavior:contain}
+.cci{display:flex;align-items:center;gap:10px;padding:8px 8px;border-radius:9px;cursor:pointer;font-size:14px}
+.cci:hover,.cci.act{background:var(--brand-primary-tint)}.cci.sel{font-weight:700}
+.cci .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cci .dl{color:var(--mute);font-variant-numeric:tabular-nums}
+.ccl .msg{padding:12px;color:var(--mute);font-size:13.5px;text-align:center}
+.f2>input{min-width:0;flex:1}
+.mapsrch{position:relative;margin-top:8px}
+.mapsrch .adl{margin-top:4px}
+.mtools{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.mtools .btn{padding:8px 12px;font-size:14px}
+#lmap{width:100%;height:clamp(230px,44vh,440px);border-radius:12px;border:1px solid var(--border);position:relative;z-index:0;isolation:isolate;background:#e8eef7}
+.pinw,.shopw{background:none;border:0}
+.pin{position:absolute;left:0;top:0;width:28px;height:28px;background:#FF3B30;border:3px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 3px 8px #0006}
+.pin:after{content:"";position:absolute;left:6px;top:6px;width:10px;height:10px;border-radius:50%;background:#fff}
+.shopw{font-size:26px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px #0005)}
+.mfail{display:grid;place-items:center;text-align:center;padding:20px;color:var(--mute);font-size:14px}
+@media(max-width:520px){
+ main{padding:0 10px}.card{padding:16px}
+ .steps{padding:10px 4px;gap:2px}.st{font-size:11px}.st b{width:24px;height:24px;font-size:12px}
+ .hero h2{font-size:20px}.hero p{display:none}.pills{display:none}.hero{padding-bottom:2px}
+ .bar>.btn{flex:1 1 auto}.ov .sheet{padding:14px 12px calc(14px + env(safe-area-inset-bottom,0px))}
+ .ccb{padding:0 9px;gap:5px}
+}
+.logo{white-space:nowrap}#hb .lnk{white-space:nowrap}
+@media(max-width:480px){.logo{font-size:18px;line-height:1.15}.logo small{display:block;margin:2px 0 0 26px;font-size:11px}#hb .lnk{font-size:13px;padding:6px 0}.top{padding:8px 14px}}
+.row.keep{grid-template-columns:1fr 1fr!important;gap:8px}
+@media(max-width:360px){.hero h2{font-size:19px}.ccb .car{display:none}}
+@media(min-width:1200px){.top,.hero,main{max-width:840px}.hero h2{font-size:28px}.card{padding:28px}}
+@media(min-width:700px){.sheet{max-width:680px}}
+
+/* inline validation */
+.ferr{font-size:13px;color:var(--error);margin-top:6px;font-weight:500;display:flex;gap:6px;align-items:flex-start;line-height:1.35}
+.ferr:before{content:"!";flex:none;width:16px;height:16px;border-radius:50%;background:var(--error);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+input.inv,textarea.inv,select.inv{border-color:var(--error)!important;background:#FF3B3008}
+input.inv:focus,textarea.inv:focus{outline-color:var(--error)}
+.chips.inv{outline:1.5px solid var(--error);outline-offset:5px;border-radius:12px}
+
+/* OTP screen */
+.vf{text-align:center;max-width:460px;margin:0 auto}
+.vf .mi{width:68px;height:68px;border-radius:50%;background:var(--brand-primary-tint);display:grid;place-items:center;font-size:32px;margin:4px auto 14px;box-shadow:0 0 0 8px #E7EFFD66}
+.vf h1{margin-bottom:6px}.vf .em{display:inline-block;background:var(--surface-secondary);border:1px solid var(--border);border-radius:99px;padding:3px 12px;font-weight:600;margin:2px 0}
+.otp{display:flex;gap:10px;justify-content:center;margin:24px 0 8px}
+.ob{width:52px;height:62px;padding:0;text-align:center;font-size:26px;font-weight:700;border-radius:14px;caret-color:var(--brand-primary)}
+.ob:not(:placeholder-shown){border-color:var(--brand-primary);background:var(--brand-primary-tint)}
+.otp.inv .ob{border-color:var(--error);background:#FF3B3008}
+.otp+.ferr{justify-content:center}
+.vf .hint{margin-top:10px}.vf .lnk:disabled{color:var(--mute);cursor:default}
+.vf .bar{margin-top:26px;text-align:left}
+@media(max-width:420px){.otp{gap:6px}.ob{width:44px;height:54px;font-size:22px;border-radius:12px}}
+/* review screen */
+.rv{display:grid;grid-template-columns:minmax(0,340px) 1fr;gap:28px;align-items:start;margin-top:10px}
+@media(max-width:760px){.rv{grid-template-columns:1fr}}
+.rv .phone{margin:0 auto;box-shadow:0 16px 36px rgba(37,75,153,.22);background:#fff;width:100%}
+.pv-img{position:relative}.pv-img.ph0{display:grid;place-items:center;background:linear-gradient(135deg,#3A76F0,#8fb4ff)}.pv-img.ph0 span{font-size:68px;filter:drop-shadow(0 4px 8px #0003)}
+.dots{position:absolute;bottom:8px;left:0;right:0;display:flex;gap:6px;justify-content:center}.dots i{width:8px;height:8px;border-radius:50%;background:#fff9;cursor:pointer}.dots i.on{background:#fff;transform:scale(1.2)}
+.pvh{display:flex;gap:10px;align-items:center;margin-bottom:10px}.pvh small{display:block}.pvh b{line-height:1.2}
+.av3{width:34px;height:34px;border-radius:50%;background:var(--brand-primary);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.pv p{margin:4px 0 8px}.pvr{display:flex;gap:6px;font-size:12.5px;color:var(--mute);margin-top:4px}
+.pvb{display:flex;gap:8px;margin-top:12px}.pvb span{flex:1;text-align:center;padding:8px;border-radius:10px;background:var(--brand-primary-tint);color:var(--brand-primary);font:600 13px system-ui}
+.sm{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14.5px}.sm span{color:var(--mute);flex:none}.sm b{text-align:right;font-weight:600;overflow-wrap:anywhere}
+.rvr h2{font-size:16px;margin:0 0 4px}.rvr h2.t2{margin-top:20px}.rvr .ck{padding:5px 0}
+/* NEBO generated image */
+.gimg{display:block;width:100%;max-width:300px;border-radius:12px;margin-top:8px;border:1px solid var(--border);box-shadow:0 6px 16px rgba(37,75,153,.15)}
+
+/* promotion cards */
+.plist{display:grid;gap:16px}
+.pcard{display:flex;background:#fff;border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 4px 16px rgba(37,75,153,.07);transition:.15s}
+.pcard:hover{box-shadow:0 10px 26px rgba(37,75,153,.14);transform:translateY(-1px)}
+.pcard .im{position:relative;flex:0 0 clamp(240px,34%,380px);min-height:230px;background:linear-gradient(135deg,#3A76F0,#8fb4ff) center/cover;display:grid;place-items:center}
+.pcard .im .em{font-size:72px;filter:drop-shadow(0 4px 8px #0003)}
+.pcard .live{position:absolute;top:12px;left:12px;background:#fff;color:#1f8a3b;font-weight:700;font-size:12px;border-radius:99px;padding:4px 11px;box-shadow:0 2px 8px #0002;display:flex;align-items:center;gap:6px}
+.pcard .live:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px #34C75933}
+.pcard .cnt{position:absolute;bottom:12px;right:12px;background:#000a;color:#fff;font-size:12px;border-radius:99px;padding:3px 10px}
+.pcard .bd{flex:1;min-width:0;padding:20px 22px;display:flex;flex-direction:column;gap:6px}
+.pcard .tg{align-self:flex-start;background:var(--brand-primary);color:#fff;border-radius:99px;padding:3px 12px;font-weight:700;font-size:13px}
+.pcard h3{margin:4px 0 0;font-size:21px;line-height:1.2}
+.pcard .by{color:var(--mute);font-size:14px}
+.pcard .ms{margin:2px 0;font-size:14.5px;color:#374151;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcard .xp{margin-top:auto;padding-top:10px}.pcard .xp .row2{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);gap:8px;flex-wrap:wrap}
+.pcard .prog{margin:6px 0 12px}
+.pcard .ac{display:flex;gap:10px;flex-wrap:wrap}.pcard .ac .btn{padding:9px 20px;font-size:14px}.pcard .ac .btn.off{opacity:.5}
+@media(max-width:700px){.pcard{flex-direction:column}.pcard .im{flex:none;height:220px;min-height:0}}
+
+/* step-2 sub-stepper */
+.steps.sub{box-shadow:none;border:0;background:none;padding:0;gap:0;margin:0 0 18px;align-items:center}
+.steps.sub .st{flex:none;display:flex;align-items:center;gap:6px;font-size:12.5px;text-align:left;white-space:nowrap}
+.steps.sub .st b{width:20px;height:20px;margin:0;font-size:11px}
+.steps.sub .st:not(:last-child){flex:1}
+.steps.sub .st:not(:last-child)::after{content:"";flex:1;height:2px;min-width:8px;margin:0 8px;border-radius:2px;background:var(--border)}
+.steps.sub .st.done:not(:last-child)::after{background:var(--success)}
+.steps.sub .st[onclick]{cursor:pointer}
+@media(max-width:520px){.steps.sub .st{font-size:11.5px;gap:4px}.steps.sub .st:not(:last-child)::after{margin:0 5px}.steps.sub .st b{width:18px;height:18px;font-size:10px}}
+
+/* dashboard-first flow */
+.ov.wm{z-index:60}.ov.wm .sheet{max-width:480px;padding:24px}
+.wzw{max-width:780px;margin:0 auto}.wzw .steps{margin-bottom:14px}
+.wzw .st[onclick]{cursor:pointer}
+.pc.cta{border:2px solid var(--brand-primary);background:linear-gradient(180deg,var(--brand-primary-tint),#fff 70%);box-shadow:0 10px 28px rgba(58,118,240,.16)}
+.guide{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}@media(max-width:860px){.guide{grid-template-columns:repeat(3,1fr)}}
+.guide>div{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;font-size:13px;line-height:1.3}
+.guide b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--brand-primary);color:#fff;font-size:12px;margin-bottom:6px}
+.guide strong{display:block;font-size:14px}.guide span{color:var(--mute)}
+.emp{text-align:center;padding:34px 18px}.emp .ei{font-size:46px}.emp h3{margin:6px 0 4px}.emp .btn{margin-top:10px}
+.emp2{text-align:center;color:var(--mute);font-size:14px;padding:26px 10px;line-height:1.6}
+@media(max-width:520px){.wzw .steps{padding:10px 2px}.wzw .st{font-size:10.5px}}
+</style></head><body>
+<header><i class="bb b1"></i><i class="bb b2"></i><i class="bb b3"></i><div class="top"><span class="logo">🫧 Bubbles Networks <small>Business Portal</small></span><span id="hb"></span></div><div class="hero"><h2>Reach nearby residents in minutes</h2><p>Sign up in seconds, then build your first promotion step by step from your dashboard.</p><div class="pills"><span>⚡ Quick sign-up</span><span>🆓 Free plan</span><span>🏙️ High-rise residents</span></div></div></header>
+<main><div class="steps" id="steps"></div><div class="card" id="view"></div></main><div id="app"></div>
+<script>
+const KEY='bn_draft_dash_v1',$=id=>document.getElementById(id),v=id=>($(id)?.value||'').trim();
+const CATS={'Retail Shops and Services':['Summer Sale','20% off all shoes','Visit us this weekend for fresh arrivals.'],'Pet Services':['Puppy Spa Day','$15 off first groom','Treat your pup to a bath, trim and a free bandana.'],'Food and Drink':['Kids Eat Free','Buy One Get One','Every Tuesday, kids eat free with any adult entrée.'],'Childcare and Caregiving':['Free Trial Day','First day free','Meet our caregivers with a free trial day.'],'Household Help and Repair':['Spring Fix-Up','$20 off any repair','Leaky tap? Book a fix and save $20.'],'Laundry':['Wash & Fold Deal','30% off first order','Free pickup from your building lobby.'],'Housing':['Open House','Tour this Saturday','Tour a bright 2-bed unit with city views.'],'Moving':['Move-In Special','$50 off local move','Book a crew for your next move.'],'Health and Fitness':['New Member Week','7 days free','Try any class free during your first week.'],'Beauty and Personal Care':['Midweek Glow','30% off facials','Book a Wednesday facial and save.'],'Professional Services':['Free Consultation','First consult free','Book a free 30-minute consultation.'],'Automotive':['Oil Change Special','$20 off oil change','Quick service while you work from home.'],'Events and Entertainment':['Grand Opening','2-for-1 tickets','Join us for live music this Friday.'],'City Hall':['Community Day','Free entry','Join your neighbors at our community event.'],'Other':['Grand Opening','30% off','Tell residents what makes your offer special.']};
+const COUNTRIES=`AF|Afghanistan|93;AL|Albania|355;DZ|Algeria|213;AS|American Samoa|1684;AD|Andorra|376;AO|Angola|244;AI|Anguilla|1264;AG|Antigua and Barbuda|1268;AR|Argentina|54;AM|Armenia|374;AW|Aruba|297;AU|Australia|61;AT|Austria|43;AZ|Azerbaijan|994;BS|Bahamas|1242;BH|Bahrain|973;BD|Bangladesh|880;BB|Barbados|1246;BY|Belarus|375;BE|Belgium|32;BZ|Belize|501;BJ|Benin|229;BM|Bermuda|1441;BT|Bhutan|975;BO|Bolivia|591;BA|Bosnia and Herzegovina|387;BW|Botswana|267;BR|Brazil|55;VG|British Virgin Islands|1284;BN|Brunei|673;BG|Bulgaria|359;BF|Burkina Faso|226;BI|Burundi|257;KH|Cambodia|855;CM|Cameroon|237;CA|Canada|1;CV|Cape Verde|238;KY|Cayman Islands|1345;CF|Central African Republic|236;TD|Chad|235;CL|Chile|56;CN|China|86;CO|Colombia|57;KM|Comoros|269;CG|Congo|242;CD|DR Congo|243;CK|Cook Islands|682;CR|Costa Rica|506;CI|Côte d'Ivoire|225;HR|Croatia|385;CU|Cuba|53;CW|Curaçao|599;CY|Cyprus|357;CZ|Czechia|420;DK|Denmark|45;DJ|Djibouti|253;DM|Dominica|1767;DO|Dominican Republic|1809;EC|Ecuador|593;EG|Egypt|20;SV|El Salvador|503;GQ|Equatorial Guinea|240;ER|Eritrea|291;EE|Estonia|372;SZ|Eswatini|268;ET|Ethiopia|251;FK|Falkland Islands|500;FO|Faroe Islands|298;FJ|Fiji|679;FI|Finland|358;FR|France|33;GF|French Guiana|594;PF|French Polynesia|689;GA|Gabon|241;GM|Gambia|220;GE|Georgia|995;DE|Germany|49;GH|Ghana|233;GI|Gibraltar|350;GR|Greece|30;GL|Greenland|299;GD|Grenada|1473;GP|Guadeloupe|590;GU|Guam|1671;GT|Guatemala|502;GG|Guernsey|44;GN|Guinea|224;GW|Guinea-Bissau|245;GY|Guyana|592;HT|Haiti|509;HN|Honduras|504;HK|Hong Kong|852;HU|Hungary|36;IS|Iceland|354;IN|India|91;ID|Indonesia|62;IR|Iran|98;IQ|Iraq|964;IE|Ireland|353;IM|Isle of Man|44;IL|Israel|972;IT|Italy|39;JM|Jamaica|1876;JP|Japan|81;JE|Jersey|44;JO|Jordan|962;KZ|Kazakhstan|7;KE|Kenya|254;KI|Kiribati|686;XK|Kosovo|383;KW|Kuwait|965;KG|Kyrgyzstan|996;LA|Laos|856;LV|Latvia|371;LB|Lebanon|961;LS|Lesotho|266;LR|Liberia|231;LY|Libya|218;LI|Liechtenstein|423;LT|Lithuania|370;LU|Luxembourg|352;MO|Macau|853;MG|Madagascar|261;MW|Malawi|265;MY|Malaysia|60;MV|Maldives|960;ML|Mali|223;MT|Malta|356;MH|Marshall Islands|692;MQ|Martinique|596;MR|Mauritania|222;MU|Mauritius|230;MX|Mexico|52;FM|Micronesia|691;MD|Moldova|373;MC|Monaco|377;MN|Mongolia|976;ME|Montenegro|382;MS|Montserrat|1664;MA|Morocco|212;MZ|Mozambique|258;MM|Myanmar|95;NA|Namibia|264;NR|Nauru|674;NP|Nepal|977;NL|Netherlands|31;NC|New Caledonia|687;NZ|New Zealand|64;NI|Nicaragua|505;NE|Niger|227;NG|Nigeria|234;NU|Niue|683;KP|North Korea|850;MK|North Macedonia|389;MP|Northern Mariana Islands|1670;NO|Norway|47;OM|Oman|968;PK|Pakistan|92;PW|Palau|680;PS|Palestine|970;PA|Panama|507;PG|Papua New Guinea|675;PY|Paraguay|595;PE|Peru|51;PH|Philippines|63;PL|Poland|48;PT|Portugal|351;PR|Puerto Rico|1787;QA|Qatar|974;RE|Réunion|262;RO|Romania|40;RU|Russia|7;RW|Rwanda|250;WS|Samoa|685;SM|San Marino|378;ST|São Tomé and Príncipe|239;SA|Saudi Arabia|966;SN|Senegal|221;RS|Serbia|381;SC|Seychelles|248;SL|Sierra Leone|232;SG|Singapore|65;SX|Sint Maarten|1721;SK|Slovakia|421;SI|Slovenia|386;SB|Solomon Islands|677;SO|Somalia|252;ZA|South Africa|27;KR|South Korea|82;SS|South Sudan|211;ES|Spain|34;LK|Sri Lanka|94;KN|St Kitts and Nevis|1869;LC|St Lucia|1758;VC|St Vincent and the Grenadines|1784;SD|Sudan|249;SR|Suriname|597;SE|Sweden|46;CH|Switzerland|41;SY|Syria|963;TW|Taiwan|886;TJ|Tajikistan|992;TZ|Tanzania|255;TH|Thailand|66;TL|Timor-Leste|670;TG|Togo|228;TO|Tonga|676;TT|Trinidad and Tobago|1868;TN|Tunisia|216;TR|Türkiye|90;TM|Turkmenistan|993;TC|Turks and Caicos Islands|1649;TV|Tuvalu|688;UG|Uganda|256;UA|Ukraine|380;AE|United Arab Emirates|971;GB|United Kingdom|44;US|United States|1;UY|Uruguay|598;VI|US Virgin Islands|1340;UZ|Uzbekistan|998;VU|Vanuatu|678;VA|Vatican City|379;VE|Venezuela|58;VN|Vietnam|84;YE|Yemen|967;ZM|Zambia|260;ZW|Zimbabwe|263`.split(';').map(x=>{const a=x.split('|');return{i:a[0],n:a[1],d:a[2]}});
+const flagEmoji=i=>String.fromCodePoint(...[...i].map(c=>127397+c.charCodeAt(0)));
+const flagImg=i=>`<img class="fl" src="https://flagcdn.com/24x18/${i.toLowerCase()}.png" srcset="https://flagcdn.com/48x36/${i.toLowerCase()}.png 2x" width="24" height="18" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;flx&quot;>${flagEmoji(i)}</span>'">`;
+const defCC=()=>{const m=(navigator.language||'').match(/[-_]([A-Za-z]{2})$/);const r=m?m[1].toUpperCase():'US';return COUNTRIES.some(c=>c.i===r)?r:'US'};
+const ccSel=()=>COUNTRIES.find(c=>c.i===val('ccf'))||COUNTRIES.find(c=>'+'+c.d===val('cc'))||COUNTRIES.find(c=>c.i===defCC());
+let S={view:'onboard',page:'dash',promos:[],editing:null,auth:false,step:1,sub:'form',wz:1,method:null,cats:[],photos:[],plan:'free',verify:'google',d:{},biz:null,walk:null,chat:[],ci:0,resume:false};
+try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&x.d&&x.d.em){S=Object.assign(S,x);S.typing=false;S.resume=x.view==='portal';S.auth=!S.resume}}catch(e){}
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const val=k=>S.d[k]||'';
+function save(){document.querySelectorAll('#view input[id],#view textarea[id],#view select[id],.ct input[id],.ct textarea[id],.ct select[id]').forEach(e=>{if(e.type==='password')return;S.d[e.id]=e.type==='checkbox'?e.checked:e.value});persist()}
+function go(n,sub='form'){save();S.step=n;S.sub=sub;persist();render();scrollTo(0,0)}
+function render(){
+ const rk=[S.view,S.page,S.step,S.sub,S.method,S.auth,S.resume,S.wz].join('|');if(rk!==RK){ERR={};RK=rk}
+ document.body.classList.toggle('pt',S.view==='portal'&&S.auth);
+ if(S.view==='portal'&&S.auth){portal();if(S.page==='create'&&S.method==='ai'){const c=$('chat');if(c)c.scrollTop=c.scrollHeight}applyErrs();return}
+ const lg=S.resume&&!S.auth;
+ $('hb').innerHTML='';
+ $('steps').style.display=lg?'none':'';
+ $('steps').innerHTML=lg?'':['Create Account','Verify Email'].map((t,i)=>{const n=S.sub==='code'?2:1;return`<div class="st ${n==i+1?'on':''} ${n>i+1?'done':''}"><b>${n>i+1?'✓':i+1}</b>${t}</div>`}).join('');
+ $('view').innerHTML=lg?login():s1();
+ applyErrs();if(S.sub==='code'&&$('o0')&&!S.auth)$('o0').focus()}
+function logout(){save();S.auth=false;S.resume=true;persist();render()}
+function login(){return`<h1>Welcome back 👋</h1><p class="sub">Sign in to go back to your dashboard.</p>
+${!S.promos.length&&(val('pt')||val('bn'))?`<div class="note ok">📌 Draft saved: <b>${esc(val('pt')||val('bn'))}</b></div>`:''}
+<label>Email</label><input id="em" value="${val('em')}"><label>Password</label><input id="pw" type="password" placeholder="Your password">
+<div class="bar"><button class="lnk" onclick="if(confirm('Delete your draft and start over?')){localStorage.removeItem('${KEY}');location.reload()}">Start over</button><button class="btn" onclick="chkLogin()">Sign in →</button></div>`}
+/* ===== inline field validation ===== */
+let ERR={},RK='';
+const raw=id=>$(id)?$(id).value:'';
+const req=(id,m)=>v(id)?'':m;
+const WEBRE=/^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}(:\d+)?(\/\S*)?$/i;
+const webMsg=id=>{const w=v(id).replace(/^https?:\/\//i,'').replace(/\/$/,'');return!w||WEBRE.test(w)?'':'Enter a valid website, like yourbusiness.com.'};
+const VALS={
+ fn:()=>req('fn','Enter your first name.'),
+ ln:()=>req('ln','Enter your last name.'),
+ em:()=>!v('em')?'Enter your email address.':/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('em'))?'':'Enter a valid email, like you@email.com.',
+ pw:()=>$('pw2')?(raw('pw').length<8?'Password needs at least 8 characters.':''):(raw('pw')?'':'Enter your password.'),
+ pw2:()=>!raw('pw2')?'Confirm your password.':raw('pw2')!==raw('pw')?'Passwords do not match.':'',
+ code:()=>/^\d{6}$/.test(v('code'))?'':'Enter the 6-digit code from your email.',
+ bn:()=>req('bn','Add your business name.'),
+ cats:()=>S.cats.length?'':'Pick at least one category.',
+ pt:()=>req('pt','Add a promotion title.'),
+ po:()=>req('po','Add the offer, e.g. 30% off.'),
+ pm:()=>req('pm','Add a short message for residents.'),
+ ps:()=>'',
+ pe:()=>{const a=raw('ps'),b=raw('pe');return a&&b&&b<=a?'End time must be after the start time.':''},
+ ad:()=>S.wz!=6||$('home')?.checked?'':(v('ad').length<5?'Enter your business address, or tick “home-based”.':''),
+ phn:()=>{const n=raw('phn').replace(/\D/g,'');if(!n)return S.wz==6?'Enter a phone number.':'';return n.length<6||n.length>15?'Enter a valid phone number (6–15 digits).':''},
+ web:()=>webMsg('web'),
+ pf_bn:()=>req('pf_bn','Business name can\'t be empty.'),
+ pf_web:()=>webMsg('pf_web')
+};
+const fieldBox=id=>{if(id==='code')return $('otp');const e=$(id);return e?(e.closest('.adw')||e.closest('.f2')||e):null};
+function paint(id){const e=$(id),box=fieldBox(id);if(!e||!box)return;let n=box.nextElementSibling;const has=n&&n.classList.contains('ferr')&&n.dataset.for===id;
+ if(ERR[id]){if(!has){n=document.createElement('div');n.className='ferr';n.dataset.for=id;n.setAttribute('role','alert');box.after(n)}n.textContent=ERR[id];e.classList.add('inv');e.setAttribute('aria-invalid','true')}
+ if(id==='code')box.classList.toggle('inv',!!ERR[id]);
+ else{if(has)n.remove();e.classList.remove('inv');e.removeAttribute('aria-invalid')}
+ if(id==='code')box.classList.toggle('inv',!!ERR[id])}
+const setErr=(id,m)=>{ERR[id]=m;paint(id)};
+const clrErr=id=>{delete ERR[id];paint(id)};
+const applyErrs=()=>Object.keys(ERR).forEach(paint);
+function check(ids){let first=null;
+ ids.forEach(id=>{const e=$(id);if(!e||e.closest('.hide'))return;const m=VALS[id]();m?setErr(id,m):clrErr(id);if(m&&!first)first=id});
+ if(first){const e=$(first);fieldBox(first).scrollIntoView({block:'center',behavior:'smooth'});if(first==='code'){const b=OB();(b.find(x=>!x.value)||b[5]).focus()}else if(first!=='cats')e.focus({preventScroll:true})}
+ return!first}
+const recheck=i=>{if(ERR[i]){const m=VALS[i]?VALS[i]():'';m?setErr(i,m):clrErr(i)}};
+/* validate a field when the user leaves it (only if they typed something, so tabbing past doesn't nag) */
+document.addEventListener('focusout',e=>{const id=e.target.id,f=VALS[id];if(!f||e.target.type==='checkbox'||!(e.target.value||'').trim())return;const m=f();m?setErr(id,m):clrErr(id)});
+/* and clear / update the message live while they fix it */
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{const id=e.target.id;if(!id)return;recheck(id);
+ if(id=='pw'&&raw('pw2')){const m=VALS.pw2();m?setErr('pw2',m):clrErr('pw2')}
+ if(id=='ps'&&raw('pe')){const m=VALS.pe();m?setErr('pe',m):clrErr('pe')}}));
+function chkLogin(){if(!check(['em','pw']))return;S.auth=true;S.resume=false;persist();render()}
+function chkCode(){if(!check(['code']))return;S.auth=true;S.view='portal';S.page='dash';S.wz=1;S.method=null;S.welcomed=true;persist();render();scrollTo(0,0);setTimeout(welcomeModal,350)}
+function homeChg(){save();clrErr('ad');render()}
+function saveProf(){if(!check(['pf_bn','pf_web']))return;S.d.bn=v('pf_bn');S.d.ad=v('pf_ad');S.d.web=v('pf_web').replace(/^https?:\/\//i,'').replace(/\/$/,'');persist();toast('Profile saved ✓')}
+
+/* OTP boxes */
+const OB=()=>[...document.querySelectorAll('#otp .ob')];
+function otpSync(){const c=OB().map(x=>x.value).join('');if($('code'))$('code').value=c;recheck('code');return c}
+function otpIn(el,i){el.value=el.value.replace(/\D/g,'').slice(-1);otpSync();if(el.value&&i<5)$('o'+(i+1)).focus()}
+function otpKey(e,i){const b=OB();
+ if(e.key==='Backspace'&&!b[i].value&&i>0){e.preventDefault();b[i-1].value='';b[i-1].focus();otpSync()}
+ else if(e.key==='ArrowLeft'&&i>0){e.preventDefault();b[i-1].focus()}
+ else if(e.key==='ArrowRight'&&i<5){e.preventDefault();b[i+1].focus()}
+ else if(e.key==='Enter'){e.preventDefault();chkCode()}}
+function otpPaste(e){const d=((e.clipboardData||window.clipboardData).getData('text')||'').replace(/\D/g,'').slice(0,6);if(!d)return;e.preventDefault();
+ OB().forEach((x,i)=>x.value=d[i]||'');otpSync();OB()[Math.min(d.length,5)].focus()}
+function resend(b){b.disabled=true;let n=30;b.textContent='Resend in 30s';toast('New code sent ✓');
+ const t=setInterval(()=>{const r=$('rs');if(!r){clearInterval(t);return}n--;if(n<=0){clearInterval(t);r.disabled=false;r.textContent='Resend code'}else r.textContent='Resend in '+n+'s'},1000)}
+/* STEP 1 */
+function s1(){if(S.sub==='code')return`<div class="vf"><div class="mi">📬</div><h1>Check your email</h1><p class="sub" style="margin:0">We sent a 6-digit code to<br><span class="em">${esc(val('em'))}</span></p>
+<input type="hidden" id="code"><div class="otp" id="otp">${[0,1,2,3,4,5].map(n=>`<input class="ob" id="o${n}" maxlength="1" inputmode="numeric" autocomplete="${n?'off':'one-time-code'}" placeholder=" " aria-label="Digit ${n+1}" oninput="otpIn(this,${n})" onkeydown="otpKey(event,${n})" onpaste="otpPaste(event)" onfocus="this.select()">`).join('')}</div>
+<div class="hint">Demo: enter any 6 digits.</div>
+<div class="hint">Didn't get it? <button class="lnk" id="rs" onclick="resend(this)">Resend code</button> · <button class="lnk" onclick="go(1)">Change email</button></div>
+<div class="bar"><button class="btn ghost" onclick="go(1)">Back</button><button class="btn" onclick="chkCode()">Verify &amp; continue</button></div></div>`;
+return`<h1>Welcome to Bubbles Networks 👋</h1><p class="sub">Sign up and promote your business to nearby high-rise residents within minutes.</p>
+<div class="row keep"><div><label>First name</label><input id="fn" value="${val('fn')}"></div><div><label>Last name</label><input id="ln" value="${val('ln')}"></div></div>
+<label>Email address</label><input id="em" type="email" value="${val('em')}" placeholder="you@email.com">
+<div class="row keep"><div><label>Password</label><input id="pw" type="password" placeholder="8+ characters"></div><div><label>Confirm password</label><input id="pw2" type="password"></div></div>
+<div class="note">✨ No payment or plan needed yet. Create and preview your promotion first.</div>
+<div class="bar"><span class="hint">Already have an account? <button class="lnk" onclick="alert('Demo: sign-in screen')">Log in</button></span><button class="btn" onclick="chk1()">Create account</button></div>`}
+function chk1(){save();if(!check(['fn','ln','em','pw','pw2']))return;go(1,'code')}
+/* helpers */
+const fmtPh=s=>{const d=s.replace(/\D/g,'').slice(0,15);return[d.slice(0,3),d.slice(3,6),d.slice(6)].filter(Boolean).join('-')};
+const phoneField=()=>{const c=ccSel();return`<div class="f2 ccw"><input type="hidden" id="cc" value="+${c.d}"><input type="hidden" id="ccf" value="${c.i}"><button type="button" class="ccb" id="ccb" onclick="ccToggle()" aria-haspopup="listbox" aria-expanded="false" title="Country code: ${c.n}">${flagImg(c.i)}<b>+${c.d}</b><span class="car">▾</span></button><input id="phn" type="tel" inputmode="tel" autocomplete="tel-national" value="${val('phn')}" placeholder="Phone number" oninput="this.value=fmtPh(this.value)"><div class="ccp hide" id="ccp"><input class="ccs" placeholder="Search country or code" autocomplete="off" oninput="ccFilter()" onkeydown="ccKey(event)"><div class="ccl" id="ccl" role="listbox"></div></div></div>`};
+const fullPh=()=>val('phn')?`${val('cc')||'+1'}-${val('phn')}`:'';
+const addrField=()=>`<div class="adw"><div class="f2"><input id="ad" value="${val('ad')}" placeholder="Start typing your address" autocomplete="off" role="combobox" aria-autocomplete="list" oninput="adType()" onfocus="adType()" onkeydown="adKey(event)" ${val('home')?'disabled':''}><button class="btn ghost" ${val('home')?'disabled':''} onclick="openMap('biz')">📍 Map</button></div><div class="sg adl hide" id="adl" role="listbox"></div></div>`;
+/* ===== OpenStreetMap geocoding (Photon search, Nominatim reverse) ===== */
+const GC={};let gAbort=null;
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uniq=a=>a.filter((x,i)=>x&&a.indexOf(x)===i);
+async function geoSearch(q,bias){
+ const k=q.toLowerCase()+(bias?'@'+bias.lat.toFixed(1)+','+bias.lng.toFixed(1):'');if(GC[k])return GC[k];
+ gAbort&&gAbort.abort();gAbort=new AbortController();const signal=gAbort.signal;let out=[];
+ try{
+  const r=await fetch('https://photon.komoot.io/api/?lang=en&limit=6&q='+encodeURIComponent(q)+(bias?`&lat=${bias.lat}&lon=${bias.lng}`:''),{signal});
+  if(!r.ok)throw new Error('photon');const j=await r.json();
+  out=(j.features||[]).map(f=>{const p=f.properties||{},c=f.geometry.coordinates,st=[p.housenumber,p.street].filter(Boolean).join(' ');
+   const main=p.name||st||p.city||p.state||p.country||'';const sub=uniq([p.name&&st?st:'',p.district||p.locality,p.city,p.state,p.country]).filter(x=>x!==main);
+   return{main,sub:sub.join(', '),label:[main,...sub].join(', '),lat:c[1],lng:c[0]}});
+ }catch(e){
+  if(e.name==='AbortError')throw e;
+  const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&q='+encodeURIComponent(q),{signal});
+  const j=await r.json();out=j.map(x=>{const a=x.display_name.split(', ');return{main:a[0],sub:a.slice(1,4).join(', '),label:x.display_name,lat:+x.lat,lng:+x.lon}});
+ }
+ return GC[k]=out}
+let revT,revN=0;
+async function reverseGeo(lat,lng){
+ try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&accept-language=en&lat=${lat}&lon=${lng}`);const j=await r.json();
+  if(j.error)throw 0;const a=j.address||{},st=[a.house_number,a.road||a.pedestrian||a.footway].filter(Boolean).join(' ');
+  const name=j.name&&j.name!==a.road?j.name:'';
+  return uniq([name,st,a.neighbourhood||a.suburb,a.city||a.town||a.village||a.county,a.state,a.country]).join(', ')||j.display_name;
+ }catch(e){return`${lat.toFixed(5)}, ${lng.toFixed(5)}`}}
+const deb=(f,ms)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>f(...a),ms)}};
+function sugHTML(list,pickFn,note){return list.length?list.map((r,i)=>`<div class="it" role="option" data-i="${i}" onclick="${pickFn}(${i})"><b>📍 ${esc(r.main)}</b>${r.sub?`<span>${esc(r.sub)}</span>`:''}</div>`).join('')+`<div class="att">© OpenStreetMap contributors</div>`:`<div class="msg">${note||'No matches found. Try a nearby landmark or drop a pin on the map.'}</div>`}
+function moveAct(box,d){const its=[...box.querySelectorAll('.it')];if(!its.length)return;let i=its.findIndex(x=>x.classList.contains('act'));its.forEach(x=>x.classList.remove('act'));i=(i+d+its.length)%its.length;its[i].classList.add('act');its[i].scrollIntoView({block:'nearest'})}
+
+/* business address field (step 4 and step 2) */
+let AD=[];
+const adRun=deb(async q=>{const box=$('adl');if(!box)return;try{AD=await geoSearch(q,null);if($('ad')&&v('ad')===q)box.innerHTML=sugHTML(AD,'adPick')}catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="msg">Couldn\'t load suggestions. Check your connection, or pick on the map.</div>'}},350);
+function adType(){const q=v('ad'),box=$('adl');if(!box)return;
+ if(S.biz&&S.biz.addr!==$('ad').value){S.biz=null}
+ if(q.length<3){box.classList.add('hide');return}
+ box.classList.remove('hide');box.innerHTML='<div class="msg">Searching…</div>';adRun(q)}
+function adPick(i){const r=AD[i];if(!r)return;$('ad').value=r.label;S.biz={lat:r.lat,lng:r.lng,addr:r.label};S.d.ad=r.label;$('adl').classList.add('hide');save()}
+function adKey(e){const box=$('adl');if(!box||box.classList.contains('hide'))return;
+ if(e.key==='ArrowDown'){e.preventDefault();moveAct(box,1)}else if(e.key==='ArrowUp'){e.preventDefault();moveAct(box,-1)}
+ else if(e.key==='Enter'){const a=box.querySelector('.it.act');if(a){e.preventDefault();adPick(+a.dataset.i)}}
+ else if(e.key==='Escape')box.classList.add('hide')}
+
+/* country picker with flags + search */
+function ccRender(q=''){const t=q.trim().toLowerCase().replace(/^\+/,''),cur=ccSel().i;
+ const list=COUNTRIES.filter(c=>!t||c.n.toLowerCase().includes(t)||c.i.toLowerCase()===t||c.d.startsWith(t));
+ $('ccl').innerHTML=list.length?list.map(c=>`<div class="cci ${c.i===cur?'sel':''}" role="option" data-i="${c.i}" onclick="ccPick('${c.i}')">${flagImg(c.i)}<span class="nm">${esc(c.n)}</span><span class="dl">+${c.d}</span></div>`).join(''):'<div class="msg">No country found</div>';
+ const f=$('ccl').querySelector('.cci.sel')||$('ccl').querySelector('.cci');if(q&&f)f.classList.add('act')}
+function ccToggle(){const p=$('ccp'),open=p.classList.contains('hide');p.classList.toggle('hide',!open);$('ccb').setAttribute('aria-expanded',open);
+ if(open){const i=p.querySelector('.ccs');i.value='';ccRender();const sel=$('ccl').querySelector('.sel');sel&&sel.scrollIntoView({block:'center'});i.focus({preventScroll:true})}}
+const ccFilter=()=>ccRender($('ccp').querySelector('.ccs').value);
+function ccPick(iso){const c=COUNTRIES.find(x=>x.i===iso);$('cc').value='+'+c.d;$('ccf').value=c.i;
+ $('ccb').innerHTML=`${flagImg(c.i)}<b>+${c.d}</b><span class="car">▾</span>`;$('ccb').title='Country code: '+c.n;
+ $('ccp').classList.add('hide');$('ccb').setAttribute('aria-expanded','false');save();$('phn').focus()}
+function ccKey(e){const box=$('ccl');
+ if(e.key==='ArrowDown'){e.preventDefault();moveAct(box,1)}else if(e.key==='ArrowUp'){e.preventDefault();moveAct(box,-1)}
+ else if(e.key==='Enter'){e.preventDefault();const a=box.querySelector('.cci.act')||box.querySelector('.cci');a&&ccPick(a.dataset.i)}
+ else if(e.key==='Escape'){$('ccp').classList.add('hide');$('ccb').setAttribute('aria-expanded','false');$('ccb').focus()}}
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.ccw')){const p=$('ccp');if(p&&!p.classList.contains('hide')){p.classList.add('hide');$('ccb')?.setAttribute('aria-expanded','false')}}
+ if(!e.target.closest('.adw')){const b=$('adl');b&&b.classList.add('hide')}});
+function tog(k){save();const i=S.cats.indexOf(k);i<0?S.cats.push(k):S.cats.splice(i,1);if(S.cats.length)delete ERR.cats;render()}
+function show(id){$(id).classList.remove('hide')}
+function addPh(el){const f=el.files[0];if(!f||S.photos.length>=4)return;save();const r=new FileReader();r.onload=()=>{S.photos.push(`url(${r.result})`);persist();render()};r.readAsDataURL(f)}
+function rm(i){save();S.photos.splice(i,1);render()}
+const foodRe=/food|pizza|burger|meal|dish|cake|drink|coffee|sushi|dessert|plate|dinner|lunch|menu/;
+function genAI(){save();const p=v('aip').toLowerCase(),m=$('aim');
+ if(!p)return m.innerHTML='<div class="note">Describe the image first, e.g. "modern storefront".</div>';
+ if(foodRe.test(p))return m.innerHTML='<div class="note bad"><b>Not created: AI food images aren\'t allowed.</b><br>Remove the food words from your description, or upload a real photo of your dishes.</div>';
+ if(/nude|gun|blood|hate|kill|drug/.test(p))return m.innerHTML='<div class="note bad"><b>Rejected: prohibited content.</b><br>Remove the offensive word(s) and try again.</div>';
+ if(S.photos.length>=4)return m.innerHTML='<div class="note">You have 4 photos. Remove one first.</div>';
+ S.photos.push(aiArt(p,S.cats[0]||'Other',v('bn')||'Your Business',Math.random()).css);persist();render();toast('Image created ✓')}
+
+/* ===== NEBO image generator: builds a storefront illustration from the business + category + prompt ===== */
+const CI={'Retail Shops and Services':['🛍️',215],'Pet Services':['🐶',28],'Food and Drink':['🍽️',12],'Childcare and Caregiving':['🧸',330],'Household Help and Repair':['🔧',200],'Laundry':['🧺',195],'Housing':['🏠',160],'Moving':['📦',32],'Health and Fitness':['💪',145],'Beauty and Personal Care':['💅',320],'Professional Services':['💼',225],'Automotive':['🚗',5],'Events and Entertainment':['🎉',275],'City Hall':['🏛️',240],'Other':['✨',220]};
+function aiArt(prompt,cat,name,seed){
+ let st=0;for(const ch of (prompt+'|'+name))st=(st*31+ch.charCodeAt(0))>>>0;st=(st+Math.floor((seed||0)*1e9))>>>0;
+ const rnd=()=>(st=(st*1664525+1013904223)>>>0)/4294967296,[em,h0]=CI[cat]||CI.Other,p=(prompt||'').toLowerCase();
+ const night=/night|dark|evening/.test(p),sun=/sunset|sunrise|golden|warm/.test(p),h=(h0+Math.floor(rnd()*30)-15+360)%360;
+ const sk1=night?'#16213e':sun?'#ff9a6c':`hsl(${h},85%,80%)`,sk2=night?'#3a4a7a':sun?'#ffe0b0':`hsl(${h},90%,95%)`,wall=night?`hsl(${h},25%,30%)`:`hsl(${h},40%,97%)`;
+ const nm=(name||'Your Business').trim(),short=nm.length>15?nm.slice(0,14)+'…':nm,fs=Math.max(13,Math.min(24,190/Math.max(short.length,1)*1.7));
+ let sky='';for(let i=0;i<8;i++){const x=i*86-10,hh=90+rnd()*120;sky+=`<rect x="${x}" y="${330-hh}" width="${60+rnd()*30}" height="${hh}" rx="4" fill="hsl(${h},35%,${night?24:76}%)" opacity=".75"/>`}
+ let aw='';for(let i=0;i<10;i++){const x=160+i*32;aw+=`<path d="M${x} 172h32v24a16 16 0 0 1-32 0z" fill="${i%2?'#fff':`hsl(${h},75%,52%)`}"/>`}
+ let bub='';for(let i=0;i<6;i++){bub+=`<circle cx="${30+rnd()*580}" cy="${20+rnd()*140}" r="${6+rnd()*18}" fill="#fff" fill-opacity=".28" stroke="#fff" stroke-opacity=".6"/>`}
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sk1}"/><stop offset="1" stop-color="${sk2}"/></linearGradient></defs>
+<rect width="640" height="400" fill="url(#g)"/><circle cx="540" cy="70" r="34" fill="${night?'#fff8d6':'#fff3b0'}" opacity=".95"/>
+<ellipse cx="120" cy="70" rx="46" ry="16" fill="#fff" opacity=".7"/><ellipse cx="150" cy="60" rx="30" ry="14" fill="#fff" opacity=".7"/>${sky}${bub}
+<rect y="330" width="640" height="70" fill="hsl(${h},22%,${night?20:86}%)"/><rect y="330" width="640" height="6" fill="hsl(${h},22%,${night?28:78}%)"/>
+<rect x="170" y="170" width="300" height="160" fill="${wall}" stroke="hsl(${h},30%,${night?40:80}%)" stroke-width="2"/>
+<rect x="190" y="112" width="260" height="56" rx="12" fill="hsl(${h},70%,30%)"/><circle cx="222" cy="140" r="23" fill="#fff"/><text x="222" y="150" font-size="27" text-anchor="middle">${em}</text>
+<text x="346" y="147" font-size="${fs.toFixed(1)}" font-weight="700" fill="#fff" text-anchor="middle" font-family="system-ui,Segoe UI,Arial,sans-serif">${esc(short)}</text>${aw}
+<rect x="190" y="224" width="132" height="86" rx="8" fill="${night?'#ffe9a8':'#cfe6ff'}" stroke="hsl(${h},40%,45%)" stroke-width="4"/><path d="M205 308l40-80h14l-40 80zM240 308l40-80h8l-40 80z" fill="#fff" opacity=".45"/>
+<rect x="190" y="282" width="132" height="6" fill="hsl(${h},40%,45%)"/><text x="214" y="278" font-size="26">${em}</text><text x="250" y="278" font-size="26">${em}</text><text x="286" y="278" font-size="26">${em}</text>
+<rect x="346" y="228" width="92" height="102" rx="8" fill="hsl(${h},60%,38%)"/><rect x="356" y="238" width="72" height="50" rx="5" fill="${night?'#ffe9a8':'#cfe6ff'}"/><rect x="366" y="296" width="52" height="18" rx="4" fill="#fff"/><text x="392" y="309" font-size="11" font-weight="700" fill="#1f9d45" text-anchor="middle" font-family="Arial,sans-serif">OPEN</text><circle cx="428" cy="300" r="4" fill="#ffd166"/>
+<rect x="132" y="304" width="22" height="26" rx="4" fill="#b5651d"/><circle cx="143" cy="294" r="18" fill="#34C759"/><rect x="486" y="304" width="22" height="26" rx="4" fill="#b5651d"/><circle cx="497" cy="294" r="18" fill="#2fb350"/></svg>`;
+ const src='data:image/svg+xml;charset=utf8,'+encodeURIComponent(svg).replace(/'/g,'%27').replace(/\(/g,'%28').replace(/\)/g,'%29');
+ return{src,css:`url('${src}')`}}
+/* STEP 2 */
+function s2(){const m=S.method;
+ if(!m)return`<h1>${S.promos.length?'Create a new promotion':'Create your first promotion 🎉'}</h1><p class="sub">Pick how to start. You can switch anytime.</p><div class="opts">
+<div class="opt" onclick="S.method='own';persist();render()"><div class="ic">✍️</div><b>I Will Create My Own</b><span>Quick form, about 2 minutes.</span></div>
+<div class="opt" onclick="startChat()"><div class="ic">💬</div><b>Let Us Create One for You</b><span>Chat with NEBO. It asks, you answer, done.</span></div></div>`;
+ if(m==='ai')return chatView();
+ const n=S.wz||1,c=S.cats[0],h=CATS[c]||['Grand Opening','30% off','Tell residents what makes your offer special.'];
+ const T=[['Tell us about your business','Who is this promotion for? <button class="lnk" onclick="startChat()">💬 Prefer chatting with NEBO?</button>'],['Create your offer','What are you promoting? Keep it short and catchy.'],['Add photos','Promotions with a photo get more taps. Up to 4, optional.'],['Add contact details','All optional. Add what helps residents reach you.']][n-1];
+ const body=[
+`<label>Business name</label><input id="bn" value="${val('bn')}" placeholder="e.g. Sunny Side Café">
+<label>Category <span class="hint">(pick one or more)</span></label><div class="chips" id="cats">${Object.keys(CATS).map(k=>`<span class="chip ${S.cats.includes(k)?'sel':''}" onclick="tog('${k}')">${k}</span>`).join('')}</div>
+<label>Address <span class="hint">(optional now)</span></label>${addrField()}
+<label style="font-weight:400"><input type="checkbox" id="home" style="width:auto" ${val('home')?'checked':''} onchange="homeChg()"> I'm home-based / no physical address</label>`,
+`<label>Promotion title</label><input id="pt" value="${val('pt')}" placeholder="e.g. ${h[0]}">
+<label>Offer</label><input id="po" value="${val('po')}" placeholder="e.g. ${h[1]}">
+<label>Message</label><textarea id="pm" rows="3" placeholder="e.g. ${h[2]}">${val('pm')}</textarea>
+<div class="hint">${c?'Examples match: '+c:'Pick a category to see tailored examples.'}</div>
+<div class="row"><div><label>Starts <span class="hint">(optional)</span></label><input id="ps" type="datetime-local" value="${val('ps')}"></div><div><label>Ends <span class="hint">(optional)</span></label><input id="pe" type="datetime-local" value="${val('pe')}"></div></div>`,
+`<div class="photos">${[0,1,2,3].map(i=>S.photos[i]?`<div class="ph" style="background-image:${S.photos[i]}"><i onclick="rm(${i})">×</i></div>`:`<div class="ph" onclick="$('file').click()">＋<br>Add photo</div>`).join('')}</div>
+<input type="file" id="file" accept="image/*" class="hide" onchange="addPh(this)">
+<div class="f2" style="margin-top:10px"><input id="aip" placeholder="Describe an AI image, e.g. modern storefront" value="${val('aip')}"><button class="btn ghost" onclick="genAI()">✨ Generate</button></div><div id="aim"></div>`,
+`<div class="adds"><button class="btn ghost" onclick="show('ph')">📞 Add phone number</button><button class="btn ghost" onclick="show('wb')">🌐 Add website</button><button class="btn ghost" onclick="show('wd')">🚶 Add walking directions</button></div>
+<div id="ph" class="${val('phn')?'':'hide'}"><label>Phone</label>${phoneField()}</div>
+<div id="wb" class="${val('web')?'':'hide'}"><label>Website</label><input id="web" value="${val('web')}" placeholder="yourbusiness.com" onblur="this.value=this.value.replace(/^https?:\\/\\//,'').replace(/\\/$/,'')"><div class="hint">No http:// needed.</div></div>
+<div id="wd" class="${S.walk||val('wdir')?'':'hide'}"><label>Walking directions</label>
+<div class="note">${S.walk?`🚶 Start: <b>${S.walk.addr}</b>${S.walk.min?` · about ${S.walk.min} min walk`:''}`:'Show residents how to walk to you. Pick a starting point (e.g. the tower lobby).'}</div>
+<button class="btn ghost" onclick="openMap('walk')">🗺️ ${S.walk?'Change':'Pick'} start point on map</button>
+<textarea id="wdir" rows="2" style="margin-top:8px" placeholder="Optional note: e.g. Exit the lobby, turn left, we're past the corner café.">${val('wdir')}</textarea></div>`][n-1];
+ return`${S.editing!=null?`<div class="note">✏️ Editing your live promotion. <button class="lnk" onclick="cancelEdit()">Cancel</button></div>`:''}<h1>${T[0]}</h1><p class="sub">${T[1]}</p>
+${body}
+<div class="bar"><button class="btn ghost" onclick="wzBack()">Back</button><button class="btn" onclick="wzNext()">Next →</button></div>`}
+/* ===== Welcome pop-up shown right after sign-up ===== */
+function welcomeModal(){cl();modal(wmStart());const o=[...document.querySelectorAll('.ov')].pop();if(o)o.classList.add('wm')}
+const wmStart=()=>`<div class="center"><div class="big">🎉</div><h2 style="margin:0 0 6px">Welcome, ${esc(val('fn')||'there')}!</h2><p class="sub">Your account is ready. Let's create your first promotion so nearby residents can discover your business.</p>
+<div class="bar" style="justify-content:center"><button class="btn ghost" onclick="cl()">Maybe later</button><button class="btn" onclick="wmChoose()">Create promotion →</button></div></div>`;
+function wmChoose(){const s=document.querySelector('.ov.wm .sheet');if(!s)return;s.innerHTML=`<h2 style="margin:0 0 4px">How would you like to start?</h2><p class="sub">Pick one. You can switch anytime.</p>
+<div class="opts"><div class="opt" onclick="wmPick('own')"><div class="ic">✍️</div><b>I Will Create My Own</b><span>Quick step-by-step form, about 2 minutes.</span></div>
+<div class="opt" onclick="wmPick('ai')"><div class="ic">💬</div><b>Let Us Create One for You</b><span>Chat with NEBO. It asks, you answer, done.</span></div></div>
+<div class="bar"><button class="lnk" onclick="document.querySelector('.ov.wm .sheet').innerHTML=wmStart()">← Back</button><span></span></div>`}
+function wmPick(m){cl();S.page='create';S.wz=1;S.nav=false;if(m==='ai')startChat();else{S.method='own';persist();render();scrollTo(0,0)}}
+/* ===== Create-promotion wizard inside the dashboard ===== */
+const WZ=['Business','Offer','Photos','Details','Review','Publish'];
+const chatStep=()=>S.ci<2?1:S.ci<5?2:S.ci<6?3:5;
+function wzBar(){const chat=S.method==='ai'&&(S.wz||1)===1,n=chat?chatStep():(S.wz||1);return`<div class="steps wzs">${WZ.map((t,i)=>`<div class="st ${n==i+1?'on':''} ${n>i+1?'done':''}" ${!chat&&n>i+1&&n<7?`onclick="wzGo(${i+1})"`:''}><b>${n>i+1?'✓':i+1}</b>${t}</div>`).join('')}</div>`}
+function wzView(){const n=S.wz||1;return n===7?wzDone():n===5?s3():n===6?s4():s2()}
+function wzGo(n){save();S.wz=n;persist();render();scrollTo(0,0)}
+function wzNext(){save();const n=S.wz||1,ids=[['bn','cats'],['pt','po','pm','ps','pe'],[],['web','phn']][n-1];if(!check(ids))return;wzGo(n+1)}
+function wzBack(){const n=S.wz||1;if(n<=1){save();S.method=null;persist();render()}else wzGo(n-1)}
+function startWz(){S.page='create';S.nav=false;persist();render();scrollTo(0,0)}
+function startChatDash(){S.page='create';S.wz=1;S.nav=false;startChat()}
+function wzDone(){return`<div class="center"><div class="big">🎊</div><h1>Your promotion is live!</h1><p class="sub"><b>${esc(val('pt'))}</b> is now visible to nearby residents. We'll email you when verification completes.</p>
+<div class="bar" style="justify-content:center"><button class="btn ghost" onclick="prev(0)">Preview promotion</button><button class="btn" onclick="S.page='dash';S.wz=1;S.method=null;persist();render();scrollTo(0,0)">Go to dashboard →</button></div></div>`}
+/* NEBO chat */
+const Q=[
+ {k:'bn',t:"Hi, I'm NEBO 👋 I'll build your promotion in about a minute. What's your business name?"},
+ {k:'cat',t:"Lovely! What type of business is it?",chips:Object.keys(CATS)},
+ {k:'po',t:c=>`What's the offer? For example: "${CATS[c][1]}"`},
+ {k:'pm',t:c=>`Tell residents a bit about it. For example: "${CATS[c][2]}"`},
+ {k:'ps',t:"When does it run?",chips:['This weekend','Next 7 days','Skip, no dates']},
+ {k:'img',t:"Last one: want a photo? Tap below, or describe the image you'd like (e.g. \"cozy storefront at sunset\").",chips:["I'll add one later",'Generate AI image']}];
+function startChat(){save();S.method='ai';if(!S.chat.length){S.chat=[{f:'n',t:Q[0].t}];S.ci=0}persist();render()}
+function chatView(){const q=Q[S.ci],fin=S.ci>=Q.length,c=S.cats[0];
+ return`<h1>Chat with NEBO 💬</h1><p class="sub">Answer a few quick questions. <button class="lnk" onclick="S.method='own';S.wz=1;render()">Switch to the form</button></p>
+<div class="chat" id="chat">${S.chat.map(m=>`<div class="m ${m.f}">${m.f=='n'?'<div class="av">NEBO</div>':''}${m.t}</div>`).join('')}${S.typing?`<div class="m n">${S.typing===true?'…':S.typing}</div>`:''}</div>
+${fin&&!S.typing?`<div class="bar"><button class="btn ghost" onclick="S.chat=[];S.ci=0;startChat()">Start over</button><button class="btn" onclick="finishChat()">✨ Create my promotion</button></div>`:
+ q&&!S.typing?`${q.chips?`<div class="chips" style="margin-top:10px">${q.chips.map(x=>`<span class="chip" onclick="ans(this.textContent)">${x}</span>`).join('')}</div>`:''}<div class="f2" style="margin-top:10px"><input id="ci" placeholder="Type your answer…" onkeydown="if(event.key=='Enter')ans()"><button class="btn" onclick="ans()">Send</button></div>`:''}`}
+function ans(t){t=t||v('ci');delete ERR.ci;if(!t)return setErr('ci','Please type an answer or pick an option.');const q=Q[S.ci];let extra=null;S.chat.push({f:'u',t});
+ if(q.k=='bn')S.d.bn=t;
+ if(q.k=='cat'){S.cats=[CATS[t]?t:'Other']}
+ if(q.k=='po')S.d.po=t;if(q.k=='pm')S.d.pm=t;
+ if(q.k=='ps'){const n=new Date(),f=d=>new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,16);if(/weekend/i.test(t)){const s=new Date(n);s.setDate(n.getDate()+((6-n.getDay()+7)%7||7));s.setHours(10,0);const e=new Date(s);e.setDate(s.getDate()+1);e.setHours(18,0);S.d.ps=f(s);S.d.pe=f(e)}else if(/7/.test(t)){S.d.ps=f(n);S.d.pe=f(new Date(+n+7*864e5))}}
+ if(q.k=='img'&&!/later|skip/i.test(t)){const pr=/^generate ai image$/i.test(t)?'':t;
+  if(S.cats[0]=='Food and Drink'||foodRe.test(pr.toLowerCase()))extra={f:'n',t:"AI food images aren't allowed, so please upload a real photo in the review step. 📷"};
+  else if(/nude|gun|blood|hate|kill|drug/i.test(pr))extra={f:'n',t:"I can't create that one. Try describing your storefront or service instead."};
+  else if(S.photos.length>=4)extra={f:'n',t:'You already have 4 photos, so I skipped the image. You can manage them in the review step.'};
+  else{const a=aiArt(pr,S.cats[0]||'Other',S.d.bn||'Your Business',Math.random());S.photos.push(a.css);extra={f:'n',img:1,t:`Here's an image I made for <b>${esc(S.d.bn||'your business')}</b> 🎨<img class="gimg" src="${a.src}" alt="AI-generated storefront illustration" onload="const c=this.closest('.chat');if(c)c.scrollTop=c.scrollHeight"><span class="hint">It's added to your promotion. Swap it for your own photo anytime on the next steps.</span>`}}}
+ S.ci++;S.typing=extra&&extra.img?'🎨 Creating your image…':true;persist();render();
+ setTimeout(()=>{S.typing=false;if(extra)S.chat.push(extra);const n=Q[S.ci];S.chat.push({f:'n',t:n?(typeof n.t=='function'?n.t(S.cats[0]):n.t):`Perfect! Here's what I have: <b>${esc(S.d.bn)}</b> · ${S.cats[0]} · ${esc(S.d.po)}. Ready to create it?`});persist();render()},extra&&extra.img?1600:600)}
+function finishChat(){const h=CATS[S.cats[0]];S.d.pt=h[0];S.method='own';wzGo(5)}
+/* STEP 3 */
+function pvGo(i){S.pvi=i;render()}
+function s3(){const c=S.cats[0],em=(CI[c]||CI.Other)[0],ph=S.photos,pi=Math.min(S.pvi||0,Math.max(0,ph.length-1)),img=ph[pi]?`background-image:${ph[pi]}`:'';
+ const fd=x=>{if(!x)return'';const d=new Date(x);return isNaN(d)?x.replace('T',' '):d.toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})};
+ const runs=val('ps')?`${fd(val('ps'))}${val('pe')?' → '+fd(val('pe')):''}`:'Starts when you publish · 90 days';
+ const ready=[['Business name',!!val('bn')],['Title',!!val('pt')],['Offer',!!val('po')],['Message',!!val('pm')]];
+ return`<h1>Looks great? 👀</h1><p class="sub">This is exactly what residents will see. Check the details, then confirm.</p>
+<div class="rv"><div><div class="phone"><div class="pv-img ${ph[pi]?'':'ph0'}" style="${img}">${ph[pi]?'':`<span>${em}</span>`}${ph.length>1?`<div class="dots">${ph.map((_,k)=>`<i class="${k==pi?'on':''}" onclick="pvGo(${k})"></i>`).join('')}</div>`:''}</div>
+<div class="pv"><div class="pvh"><span class="av3">${esc((val('bn')||'B')[0].toUpperCase())}</span><div><b>${esc(val('bn'))}</b><small>${esc(S.cats.join(', '))}</small></div></div>
+<span class="tag">${esc(val('po'))}</span><h3>${esc(val('pt'))}</h3><p>${esc(val('pm'))}</p>
+${val('ps')?`<div class="pvr">📅 <span>${esc(runs)}</span></div>`:''}${val('web')?`<div class="pvr">🌐 <span>${esc(val('web'))}</span></div>`:''}${S.walk?`<div class="pvr">🚶 <span>${S.walk.min||''} min walk from ${esc(S.walk.addr)}</span></div>`:''}
+${fullPh()||S.walk?`<div class="pvb">${fullPh()?'<span>📞 Call</span>':''}${S.walk?'<span>🚶 Directions</span>':''}</div>`:''}</div></div></div>
+<div class="rvr"><h2>Summary</h2>
+<div class="sm"><span>Business</span><b>${esc(val('bn'))}</b></div><div class="sm"><span>Category</span><b>${esc(S.cats.join(', '))}</b></div><div class="sm"><span>Offer</span><b>${esc(val('po'))}</b></div>
+<div class="sm"><span>Runs</span><b>${esc(runs)}</b></div><div class="sm"><span>Photos</span><b>${ph.length?ph.length+' added':'None yet'}</b></div>
+<h2 class="t2">Ready check</h2>${ready.map(r=>`<div class="ck ${r[1]?'d':''}">${r[1]?'✅':'⚠️'} ${r[0]}</div>`).join('')}<div class="ck ${ph.length?'d':''}">${ph.length?'✅':'📸'} Photo ${ph.length?'':'<span class="hint">(recommended)</span>'}</div>
+${ph.length?'':`<div class="note">Promotions with a photo get more taps. <button class="lnk" onclick="wzGo(3)">Add one</button></div>`}
+<div class="note ok">No payment needed to review.</div></div></div>
+<div class="bar"><button class="btn ghost" onclick="wzGo(4)">✏️ Edit</button>${S.editing!=null?`<button class="btn" onclick="saveEdit()">Save changes</button>`:`<button class="btn" onclick="wzGo(6)">Confirm →</button>`}</div>`}
+/* STEP 4 */
+function s4(){return`<h1>Almost live! 🚀</h1><p class="sub">Only what's needed to publish. You can also <button class="lnk" onclick="logout()">save and finish later</button>.</p>
+<label>Business address ${val('home')?'<span class="hint">(home-based: not required)</span>':''}</label>${addrField()}
+<label style="font-weight:400"><input type="checkbox" id="home" style="width:auto" ${val('home')?'checked':''} onchange="homeChg()"> I'm home-based / no physical address</label>
+<label>Phone number</label>${phoneField()}<label>Website <span class="hint">(optional)</span></label><input id="web" value="${val('web')}" placeholder="yourbusiness.com" onblur="this.value=this.value.replace(/^https?:\\/\\//,'').replace(/\\/$/,'')">
+${!val('ps')?`<div class="row"><div><label>Start</label><input id="ps" type="datetime-local"></div><div><label>End</label><input id="pe" type="datetime-local"></div></div>`:''}
+<h2>Verify your business</h2>
+<div class="plan ${S.verify=='google'?'sel':''}" onclick="S.verify='google';save();render()"><div><b>Google Business Profile</b><span>Fastest. Links your listing and address.</span></div></div>
+<div class="plan ${S.verify=='alt'?'sel':''}" onclick="S.verify='alt';save();render()"><div><b>No public address? Verify another way</b><span>Upload a license, or link a social page or invoice.</span></div></div>
+<h2>Choose a plan</h2>
+${[['free','Free','$0 · 1 promotion, editable once a week, expires after 90 days',1],['weekly','Weekly','$10/week · 1 promotion',0],['monthly','Monthly','$30/month · 1 promotion',0],['multi','Multi-promotion','$50/month · 2 promotions',0]].map(p=>`<div class="plan ${S.plan==p[0]?'sel':''} ${p[3]?'':'off'}" ${p[3]?`onclick="S.plan='${p[0]}';save();render()"`:''}><input type="radio" ${S.plan==p[0]?'checked':''} ${p[3]?'':'disabled'}><div><b>${p[1]}</b>${p[3]?'':' <small>(coming soon)</small>'}<span>${p[2]}</span></div></div>`).join('')}
+<div class="note">🔒 Secure setup with Stripe. <b>The Free plan is never charged</b>, even if a card is requested to verify you.</div>
+<div class="bar"><button class="btn ghost" onclick="wzGo(5)">Back</button><button class="btn" onclick="publish()">Publish promotion</button></div>`}
+function newPromo(){['pt','po','pm','ps','pe','aip'].forEach(k=>delete S.d[k]);S.photos=[];S.chat=[];S.ci=0;S.method=null;S.walk=null;S.editing=null;S.page='create';S.wz=1;S.nav=false;persist();render();scrollTo(0,0)}
+/* MAP: real OpenStreetMap tiles via Leaflet */
+let M,LM,LMark,LShop,LRoute;
+const pinIcon=()=>L.divIcon({className:'pinw',html:'<div class="pin"></div>',iconSize:[28,34],iconAnchor:[14,34]});
+const hav=(a,b,c,d)=>{const R=6371e3,r=x=>x*Math.PI/180,u=r(c-a),w=r(d-b),h=Math.sin(u/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(w/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+let MS=[];
+function openMap(mode){save();
+ const b=S.biz&&S.biz.lat!=null?S.biz:null,s=mode=='biz'?b:(S.walk&&S.walk.lat!=null?S.walk:null);
+ M={mode,lat:s?s.lat:null,lng:s?s.lng:null,bl:b?b.lat:null,bg:b?b.lng:null,addr:s?s.addr:'',min:null};
+ const o=document.createElement('div');o.className='ov';o.id='mm';
+ o.innerHTML=`<div class="sheet"><b>${mode=='biz'?'📍 Business location':'🚶 Walking start point'}</b>
+<div class="hint">${mode=='walk'&&!b?'Tip: add your business address first to see walking time. ':''}Search, tap the map, or drag the pin to adjust.</div>
+<div class="mapsrch"><input id="ms" placeholder="Search address or place" autocomplete="off" oninput="msType()" onkeydown="msKey(event)"><div class="sg adl hide" id="msl"></div></div>
+<div class="mtools"><button class="btn ghost" onclick="myLoc()">🎯 Use my location</button></div>
+<div id="lmap"></div>
+<div class="note" id="ma" style="margin-top:10px"></div>
+<div class="bar" style="margin-top:8px"><button class="btn ghost" onclick="closeMap()">Cancel</button><button class="btn" onclick="useMap()">Use this location</button></div></div>`;
+ document.body.appendChild(o);
+ if(typeof L==='undefined'){$('lmap').outerHTML='<div class="mfail" id="lmap">The map could not load. Check your internet connection and try again. You can still type your address in the form.</div>';mUpd();return}
+ LM=L.map('lmap',{zoomControl:true,attributionControl:true}).setView([20,0],2);
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'}).addTo(LM);
+ LMark=LShop=LRoute=null;
+ if(mode=='walk'&&b)LShop=L.marker([b.lat,b.lng],{icon:L.divIcon({className:'shopw',html:'🏪',iconSize:[30,30],iconAnchor:[15,15]}),interactive:false,keyboard:false}).addTo(LM);
+ LM.on('click',e=>setPt(e.latlng.lat,e.latlng.lng));
+ if(s){setPt(s.lat,s.lng,s.addr,true);LM.setView([s.lat,s.lng],17)}
+ else if(b)LM.setView([b.lat,b.lng],16);
+ else if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{if(LM&&M.lat==null)LM.setView([p.coords.latitude,p.coords.longitude],15)},()=>{},{timeout:6000,maximumAge:6e5});
+ setTimeout(()=>LM&&LM.invalidateSize(),60);addEventListener('resize',rsz);mUpd()}
+const rsz=()=>LM&&LM.invalidateSize();
+function closeMap(){removeEventListener('resize',rsz);if(LM){LM.remove();LM=null}const o=$('mm');o&&o.remove()}
+function setPt(lat,lng,addr,keep){M.lat=lat;M.lng=lng;
+ if(!LMark){LMark=L.marker([lat,lng],{draggable:true,icon:pinIcon()}).addTo(LM);LMark.on('dragend',()=>{const p=LMark.getLatLng();setPt(p.lat,p.lng)})}else LMark.setLatLng([lat,lng]);
+ if(addr){M.addr=addr;mUpd();if(M.mode=='walk')mRoute();return}
+ M.addr='Finding address…';mUpd();if(M.mode=='walk')mRoute();
+ const n=++revN;clearTimeout(revT);revT=setTimeout(async()=>{const a=await reverseGeo(lat,lng);if(n===revN&&M){M.addr=a;mUpd()}},400)}
+async function mRoute(){
+ if(M.bl==null||M.lat==null)return;const n=revN;LRoute&&LM.removeLayer(LRoute);LRoute=null;
+ let d=hav(M.lat,M.lng,M.bl,M.bg)*1.25,pts=[[M.lat,M.lng],[M.bl,M.bg]],dash='6 6';M.min=Math.max(1,Math.ceil(d/80));M.dist=d;mUpd();
+ LM.fitBounds(L.latLngBounds(pts),{padding:[50,50],maxZoom:18});
+ try{const r=await fetch(`https://routing.openstreetmap.de/routed-foot/route/v1/foot/${M.lng},${M.lat};${M.bg},${M.bl}?overview=full&geometries=geojson`);const j=await r.json();
+  if(n!==revN||!LM||!j.routes||!j.routes[0])return;const rt=j.routes[0];pts=rt.geometry.coordinates.map(c=>[c[1],c[0]]);dash=null;M.dist=rt.distance;M.min=Math.max(1,Math.ceil(rt.duration/60))}catch(e){}
+ if(n!==revN||!LM)return;LRoute=L.polyline(pts,{color:'#3A76F0',weight:5,opacity:.85,dashArray:dash}).addTo(LM);mUpd()}
+function mUpd(){const el=$('ma');if(!el)return;let t=M.lat==null?'Tap the map to drop a pin.':`<b>${esc(M.addr)}</b>`;
+ if(M.mode=='walk'&&M.min&&M.lat!=null)t+=`<br>🚶 About ${M.min} min (${Math.round(M.dist)} m) to your business`;el.innerHTML=t}
+const msRun=deb(async q=>{const box=$('msl');if(!box)return;try{const c=LM?LM.getCenter():null;MS=await geoSearch(q,c&&LM.getZoom()>4?{lat:c.lat,lng:c.lng}:null);if($('ms')&&v('ms')===q)box.innerHTML=sugHTML(MS,'msPick')}catch(e){if(e.name!=='AbortError')box.innerHTML='<div class="msg">Couldn\'t load suggestions. Tap the map instead.</div>'}},350);
+function msType(){const q=v('ms'),box=$('msl');if(q.length<3){box.classList.add('hide');return}box.classList.remove('hide');box.innerHTML='<div class="msg">Searching…</div>';msRun(q)}
+function msPick(i){const r=MS[i];if(!r)return;$('msl').classList.add('hide');$('ms').value=r.label;if(LM){LM.setView([r.lat,r.lng],17);setPt(r.lat,r.lng,r.label)}}
+function msKey(e){const box=$('msl');if(box.classList.contains('hide'))return;
+ if(e.key==='ArrowDown'){e.preventDefault();moveAct(box,1)}else if(e.key==='ArrowUp'){e.preventDefault();moveAct(box,-1)}
+ else if(e.key==='Enter'){e.preventDefault();const a=box.querySelector('.it.act')||box.querySelector('.it');a&&msPick(+a.dataset.i)}else if(e.key==='Escape')box.classList.add('hide')}
+function myLoc(){if(!LM)return;if(!navigator.geolocation)return toast('Location is not supported on this device');
+ toast('Finding your location…');navigator.geolocation.getCurrentPosition(p=>{LM.setView([p.coords.latitude,p.coords.longitude],17);setPt(p.coords.latitude,p.coords.longitude)},()=>toast('Could not get your location. Check browser permission.'),{enableHighAccuracy:true,timeout:10000})}
+function useMap(){if(M.lat==null)return toast('Tap the map or search to drop a pin first');
+ if(M.addr==='Finding address…')return toast('One moment, finding the address…');
+ if(M.mode=='biz'){S.biz={lat:M.lat,lng:M.lng,addr:M.addr};S.d.ad=M.addr}else S.walk={lat:M.lat,lng:M.lng,addr:M.addr,min:M.min};
+ closeMap();persist();render()}
+/* PORTAL */
+const NAV=[['dash','🏠','Dashboard'],['promos','📣','Promotions'],['stats','📊','Analytics'],['verify','✅','Verification'],['bill','💳','Plan & Billing'],['prof','🏪','Business Profile'],['help','💬','Help & Support']];
+const PN=Object.fromEntries(NAV.map(n=>[n[0],n[2]]));PN.create='Create Promotion';const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],VW=[40,62,55,90,120,98,150];
+const dl=p=>Math.max(0,90-Math.floor((Date.now()-p.created)/864e5)),lk=p=>p.lastEdit&&Date.now()-p.lastEdit<6048e5?Math.ceil((6048e5-(Date.now()-p.lastEdit))/864e5):0;
+function nav(p){if(S.page==='create')save();S.page=p;S.nav=false;persist();render();scrollTo(0,0)}
+function toast(t){const e=document.createElement('div');e.className='toast';e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),2500)}
+function modal(h){const o=document.createElement('div');o.className='ov';o.innerHTML=`<div class="sheet">${h}</div>`;o.onclick=e=>{if(e.target==o)o.remove()};document.body.appendChild(o)}
+const cl=()=>document.querySelector('.ov')?.remove();
+function portal(){$('view').innerHTML='';const p=S.promos[0];
+ $('app').innerHTML=`<aside class="sb ${S.nav?'open':''}"><div class="sl">🫧 Bubbles Networks<small>Business Portal</small></div><nav>${NAV.map(n=>`<a class="${S.page==n[0]||(S.page=='create'&&n[0]=='promos')?'on':''}" onclick="nav('${n[0]}')"><span>${n[1]}</span>${n[2]}</a>`).join('')}</nav>
+<div class="sp"><b>Free plan</b><small>1 promotion · ${p?dl(p)+' days left':'90 days'}</small><button onclick="nav('bill')">See plans</button></div><a onclick="logout()">↩ Log out</a></aside>
+<div class="scr ${S.nav?'show':''}" onclick="save();S.nav=false;render()"></div>
+<div class="mn"><div class="tb"><button class="hm" onclick="save();S.nav=true;render()">☰</button><b>${PN[S.page]}</b><span style="flex:1"></span>${S.page=='create'?'':S.promos.length?`<button class="btn" onclick="anotherPromo()">＋ Create Another Promotion</button>`:`<button class="btn" onclick="startWz()">＋ Create Promotion</button>`}<span class="av2">${(val('fn')||'B')[0]}</span></div><div class="ct">${PG[S.page]()}</div></div>`}
+function anotherPromo(){if(S.promos.length>=1&&S.plan==='free')return modal(`<h2 style="margin-top:0">Your Free plan has 1 promotion 🎈</h2><p class="sub">You can edit your current promotion once a week, or get notified when Multi-promotion plans open.</p><div class="bar"><button class="lnk" onclick="cl();newPromo()">Continue demo anyway</button><span><button class="btn ghost" onclick="cl();toast('We\\'ll notify you ✓')">Notify me</button> <button class="btn" onclick="cl();nav('promos')">Edit current</button></span></div>`);newPromo()}
+function publish(){save();if(!check(['ad','phn','web','ps','pe']))return;S.promos.unshift({t:val('pt'),o:val('po'),m:val('pm'),bn:val('bn'),cats:[...S.cats],photos:[...S.photos],ps:val('ps'),pe:val('pe'),created:Date.now(),lastEdit:null});S.wz=7;persist();render();scrollTo(0,0)}
+function editPromo(i){const p=S.promos[i];if(lk(p))return toast('Editable again in '+lk(p)+' day(s)');Object.assign(S.d,{pt:p.t,po:p.o,pm:p.m,bn:p.bn,ps:p.ps,pe:p.pe});S.cats=[...p.cats];S.photos=[...p.photos];S.editing=i;S.wz=1;S.page='create';S.nav=false;S.method='own';persist();render();scrollTo(0,0)}
+function saveEdit(){save();Object.assign(S.promos[S.editing],{t:val('pt'),o:val('po'),m:val('pm'),bn:val('bn'),cats:[...S.cats],photos:[...S.photos],ps:val('ps'),pe:val('pe'),lastEdit:Date.now()});S.editing=null;S.view='portal';S.page='promos';persist();render();toast('Changes saved ✓')}
+function cancelEdit(){S.editing=null;S.view='portal';S.page='promos';persist();render()}
+function prev(i){const p=S.promos[i];modal(`<div class="phone"><div class="pv-img" style="${p.photos[0]?'background-image:'+p.photos[0]:''}"></div><div class="pv"><span class="tag">${p.o}</span><h3>${p.t}</h3><small>${p.bn} · ${p.cats.join(', ')}</small><p>${p.m}</p>${fullPh()?`<small>📞 ${fullPh()}</small>`:''}</div></div><div class="bar" style="justify-content:center"><button class="btn ghost" onclick="cl()">Close</button></div>`)}
+const stat=(i,l,v,d)=>`<div class="sc2"><div class="i">${i}</div><b>${v}</b><small>${l}</small><em>${d}</em></div>`;
+function chart(h=140){const m=Math.max(...VW);return`<svg viewBox="0 0 320 ${h}" style="width:100%">${VW.map((x,i)=>{const bh=x/m*(h-34);return`<rect x="${i*45+8}" y="${h-22-bh}" width="30" height="${bh}" rx="6" fill="${i==6?'#3A76F0':'#C9DAFB'}"/><text x="${i*45+23}" y="${h-6}" font-size="10" text-anchor="middle" fill="#6B7280">${DAYS[i]}</text><text x="${i*45+23}" y="${h-26-bh}" font-size="9" text-anchor="middle" fill="#374151">${x}</text>`}).join('')}</svg>`}
+function promoRow(p,i){const k=lk(p),d=dl(p),em=(CI[(p.cats||[])[0]]||CI.Other)[0],ph=p.photos||[];
+ return`<div class="pcard"><div class="im" style="${ph[0]?'background-image:'+ph[0]:''}">${ph[0]?'':`<span class="em">${em}</span>`}<span class="live">Live</span>${ph.length>1?`<span class="cnt">📷 ${ph.length}</span>`:''}</div>
+<div class="bd"><span class="tg">${esc(p.o)}</span><h3>${esc(p.t)}</h3><div class="by">${esc(p.bn)} · ${esc((p.cats||[]).join(', '))}</div><p class="ms" style="margin:2px 0">${esc(p.m)}</p>
+<div class="xp"><div class="row2"><span>⏳ Expires in <b>${d}</b> days</span><span>${k?'✏️ Editable again in '+k+' day(s)':'✏️ Edit available now'}</span></div><div class="prog"><i style="width:${d/90*100}%"></i></div>
+<div class="ac"><button class="btn ghost" onclick="prev(${i})">Preview</button><button class="btn ${k?'off':''}" onclick="editPromo(${i})">Edit</button></div></div></div></div>`}
+function checklist(){const p=S.promos[0],it=[['Account created',1],['First promotion published',!!p],['Phone number added',!!val('phn')],['Address added or home-based',!!val('ad')||!!val('home')],['Business verified',S.vstat=='done']],n=it.filter(x=>x[1]).length;
+ return`<b>${Math.round(n/it.length*100)}% complete</b><div class="prog"><i style="width:${n/it.length*100}%"></i></div>${it.map(x=>`<div class="ck ${x[1]?'d':''}">${x[1]?'✅':'⭕'} ${x[0]}</div>`).join('')}<button class="btn ghost" style="margin-top:10px" onclick="nav('verify')">Verify my business</button>`}
+const emptyState=(i,h,s)=>`<div class="pc emp"><div class="ei">${i}</div><h3>${h}</h3><p class="hint">${s}</p><button class="btn" onclick="startWz()">Create promotion</button></div>`;
+function dashNew(){
+ return`<div class="wel"><div><h1>Hi ${esc(val('fn')||'there')}, welcome 👋</h1><p>Your account is ready. Let's get your first promotion live.</p></div><div class="wb">🫧</div></div>
+<div class="gr">${stat('👀','Resident views','0','After you publish')}${stat('👆','Promo taps','0','After you publish')}${stat('📞','Calls','0','After you publish')}${stat('⏳','Days left','–','Free plan, 90 days')}</div>
+<div class="g2"><div class="pc"><h3>Views this week</h3><div class="emp2">📊<br>No data yet. Your views will appear here once your promotion is live.</div></div><div class="pc"><h3>Getting started</h3>${checklist()}</div></div>`}
+const PG={
+dash(){const p=S.promos[0];if(!p)return dashNew();return`<div class="wel"><div><h1>Hi ${val('fn')||'there'}, welcome 👋</h1><p>${p?'Your promotion is live and reaching nearby residents.':'Create your first promotion to start reaching residents.'}</p></div><div class="wb">🫧</div></div>
+<div class="gr">${stat('👀','Resident views','1,248','▲ 12% this week')}${stat('👆','Promo taps','86','▲ 8%')}${stat('📞','Calls','19','▲ 3')}${stat('⏳','Days left',p?dl(p):'–','Free plan, 90 days')}</div>
+<div class="g2"><div class="pc"><h3>Views this week</h3>${chart()}</div><div class="pc"><h3>Get verified</h3>${checklist()}</div></div>
+<div class="pc"><div class="hd"><h3>Your promotion</h3><a class="lnk" onclick="nav('promos')">View all</a></div>${p?promoRow(p,0):'<p class="hint">No promotion yet.</p>'}</div>`},
+create(){return`<div class="wzw">${wzBar()}<div class="card">${wzView()}</div></div>`},
+promos(){if(!S.promos.length)return emptyState('📣','No promotions yet','Create your first one. It only takes a few minutes.');return`<div><h3 style="margin:0 0 12px;font-size:18px">Your promotions</h3><div class="plist">${S.promos.map(promoRow).join('')||'<p class="hint">Nothing here yet.</p>'}</div></div><div class="note">🎈 Free plan: 1 promotion, editable once a week, expires after 90 days.</div>`},
+stats(){if(!S.promos.length)return emptyState('📊','No analytics yet','Views, taps and calls show up here once your first promotion is live.');return`<div class="gr">${stat('👀','Views','1,248','▲ 12%')}${stat('👆','Taps','86','▲ 8%')}${stat('📞','Calls','19','▲ 3')}${stat('🚶','Directions opened','31','▲ 5')}</div><div class="pc"><h3>Daily views</h3>${chart(190)}</div><div class="note">💡 Most views happen in the evening. Try ending your offer on a weekend.</div>`},
+verify(){const st=S.vstat;return`<div class="pc"><div class="hd"><h3>Business verification</h3><span class="chip2 ${st=='done'?'':'w'}">${st=='done'?'Verified':st=='pending'?'In review':'Not verified'}</span></div><p class="sub">Verified businesses build trust with residents.</p>
+<div class="plan ${S.verify=='google'?'sel':''}" onclick="S.verify='google';persist();render()"><div><b>Google Business Profile</b><span>Fastest. Links your listing and address.</span></div></div>
+<div class="plan ${S.verify=='alt'?'sel':''}" onclick="S.verify='alt';persist();render()"><div><b>No public address? Verify another way</b><span>Upload a license, or link a social page or invoice.</span></div></div>
+<button class="btn" onclick="S.vstat=S.vstat=='pending'?'done':'pending';persist();render();toast(S.vstat=='pending'?'Submitted, review takes 1–2 days':'Verified ✓ (demo)')">${st=='pending'?'Simulate approval':'Start verification'}</button></div>`},
+bill(){return`<div class="pl4">${[['Free','$0','1 promotion, editable weekly, 90 days',1],['Weekly','$10/week','1 promotion',0],['Monthly','$30/month','1 promotion',0],['Multi-promotion','$50/month','2 promotions',0]].map(p=>`<div class="pc ${p[3]?'on':''}"><h3>${p[0]}</h3><b style="font-size:22px">${p[1]}</b><p class="hint">${p[2]}</p>${p[3]?'<span class="chip2">Current plan</span>':'<button class="btn ghost" onclick="toast(\'We\\\'ll notify you ✓\')">Notify me</button>'}</div>`).join('')}</div><div class="pc" style="margin-top:12px"><h3>Payment method</h3><p class="hint">🔒 Powered by Stripe. No card needed on the Free plan.</p></div>`},
+prof(){return`<div class="pc"><h3>Business profile</h3><label>Business name</label><input id="pf_bn" value="${val('bn')}"><label>Address</label><input id="pf_ad" value="${val('ad')}" placeholder="Not added"><label>Phone</label><input value="${fullPh()}" placeholder="Not added" disabled><label>Website</label><input id="pf_web" value="${val('web')}" placeholder="Not added"><div class="bar"><span></span><button class="btn" onclick="saveProf()">Save</button></div></div>`},
+help(){return`<div class="pc"><h3>Help &amp; Support</h3>${[['How long does verification take?','Usually 1–2 business days.'],['How often can I edit a Free promotion?','Once per week.'],['When does my promotion expire?','Free promotions expire after 90 days.'],['Can I get more promotions?','Multi-promotion plans are coming soon.']].map(q=>`<details><summary>${q[0]}</summary><p class="hint">${q[1]}</p></details>`).join('')}<button class="btn" style="margin-top:12px" onclick="toast('Support will reply by email ✉️')">Contact support</button></div>`}};
+render();
+</script></body></html>
